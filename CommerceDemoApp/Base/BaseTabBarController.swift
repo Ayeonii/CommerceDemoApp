@@ -32,7 +32,7 @@ class BaseTabBarController: UITabBarController {
         
         let likeVC = LikeViewController()
         likeVC.hidesBottomBarWhenPushed = false
-        let likeNavigation = UINavigationController(rootViewController: homeVC)
+        let likeNavigation = UINavigationController(rootViewController: likeVC)
         likeNavigation.tabBarItem = likeIcon
         
         self.viewControllers = [homeNavigation, likeNavigation]
