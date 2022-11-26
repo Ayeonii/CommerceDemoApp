@@ -8,7 +8,7 @@
 import Foundation
 
 extension NSError {
-  convenience init(apiError: ApiError) {
-    self.init(domain: ApiError.errorDomain, code: apiError.errorCode, userInfo: apiError.errorUserInfo)
-  }
+    convenience init(apiError: ApiError) {
+        self.init(domain: ApiError.errorDomain, code: apiError.errorCode, userInfo: apiError.errorUserInfo)
+    }
 }

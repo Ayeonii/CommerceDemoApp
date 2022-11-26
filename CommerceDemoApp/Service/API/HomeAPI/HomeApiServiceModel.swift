@@ -30,7 +30,7 @@ struct HomeListBannerResponse: Codable {
     
     enum CodingKeys: String, CodingKey {
         case id = "id"
-        case image = "goods"
+        case image = "image"
     }
 
     init(from decoder: Decoder) throws {
