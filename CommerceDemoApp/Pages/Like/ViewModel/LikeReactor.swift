@@ -12,7 +12,7 @@ class LikeReactor: Reactor {
     let disposeBag = DisposeBag()
     
     enum Action {
-        case initialFetch
+        case getLikeGoodsList
     }
     
     enum Mutation {
@@ -29,8 +29,10 @@ class LikeReactor: Reactor {
     
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
-        case .initialFetch:
-            return Observable.concat([fetchGoodsList(), reloadAll()])
+        case .getLikeGoodsList:
+            let likeList = UserDefaultsManager.likeList ?? []
+            return Observable.concat([.just(.setGoodsList(likeList)),
+                                      reloadAll()])
         }
     }
     

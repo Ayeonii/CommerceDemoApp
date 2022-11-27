@@ -29,6 +29,7 @@
 		D6299E6D2931ABAC004139DD /* HomeApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6299E6C2931ABAC004139DD /* HomeApi.swift */; };
 		D6299E712931AC12004139DD /* HomeApiServiceModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6299E702931AC12004139DD /* HomeApiServiceModel.swift */; };
 		D6299E782931E3EC004139DD /* Int+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6299E772931E3EC004139DD /* Int+Extensions.swift */; };
+		D6C7BD7629331D3400AD4A8C /* UserDefaultsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6C7BD7529331D3400AD4A8C /* UserDefaultsManager.swift */; };
 		E4A22EBF6E45C1F431ED6B85 /* Pods_CommerceDemoApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B64F62BFC1C241B9B03B05C /* Pods_CommerceDemoApp.framework */; };
 /* End PBXBuildFile section */
 
@@ -60,6 +61,7 @@
 		D6299E6C2931ABAC004139DD /* HomeApi.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeApi.swift; sourceTree = "<group>"; };
 		D6299E702931AC12004139DD /* HomeApiServiceModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeApiServiceModel.swift; sourceTree = "<group>"; };
 		D6299E772931E3EC004139DD /* Int+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Int+Extensions.swift"; sourceTree = "<group>"; };
+		D6C7BD7529331D3400AD4A8C /* UserDefaultsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -217,6 +219,7 @@
 		D6299E5529309406004139DD /* Support */ = {
 			isa = PBXGroup;
 			children = (
+				D6C7BD7429331D1C00AD4A8C /* UserDefaults */,
 				D6299E762931B79D004139DD /* Error */,
 				D6299E5629309417004139DD /* Extensions */,
 			);
@@ -289,6 +292,14 @@
 				D6299E612930A106004139DD /* GoodsListCollectionViewCell.swift */,
 			);
 			path = CollectionViewCell;
+			sourceTree = "<group>";
+		};
+		D6C7BD7429331D1C00AD4A8C /* UserDefaults */ = {
+			isa = PBXGroup;
+			children = (
+				D6C7BD7529331D3400AD4A8C /* UserDefaultsManager.swift */,
+			);
+			path = UserDefaults;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -422,6 +433,7 @@
 				D6299E6B2931AB5D004139DD /* NSError+Extensions.swift in Sources */,
 				D6299E5929309436004139DD /* UIColor+Extensions.swift in Sources */,
 				D6299E622930A106004139DD /* GoodsListCollectionViewCell.swift in Sources */,
+				D6C7BD7629331D3400AD4A8C /* UserDefaultsManager.swift in Sources */,
 				D6299E6929319F85004139DD /* ApiError.swift in Sources */,
 				D6299E29293087A5004139DD /* SceneDelegate.swift in Sources */,
 				D6299E4A29309003004139DD /* HomeViewController.swift in Sources */,

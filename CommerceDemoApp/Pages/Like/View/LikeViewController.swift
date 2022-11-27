@@ -33,9 +33,13 @@ class LikeViewController: UIViewController, View {
         configureLayout()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        reactor?.action.onNext(.getLikeGoodsList)
+    }
+    
     func bind(reactor: LikeReactor) {
         self.bindState(reactor)
-        reactor.action.onNext(.initialFetch)
     }
     
     private func bindState(_ reactor: LikeReactor) {
@@ -65,20 +69,6 @@ extension LikeViewController {
         collectionView.snp.makeConstraints{ make in
             make.edges.equalTo(view.safeAreaLayoutGuide)
         }
-    }
-    
-    private func createGoodsLayout() -> NSCollectionLayoutSection {
-        let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .estimated(300))
-        let item = NSCollectionLayoutItem(layoutSize: itemSize)
-        
-        let groupSize = NSCollectionLayoutSize(widthDimension: .absolute(UIScreen.main.bounds.width), heightDimension: .estimated(300))
-        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitem: item, count: 1)
-        
-        let section = NSCollectionLayoutSection(group: group)
-        section.orthogonalScrollingBehavior = .none
-        section.interGroupSpacing = 1
-        
-        return section
     }
 }
 

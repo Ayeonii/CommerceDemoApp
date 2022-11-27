@@ -134,10 +134,12 @@ extension HomeViewController: UICollectionViewDataSource {
                     let willLike = !cell.likeBtn.isSelected
                     cell.likeBtn.isSelected = willLike
                     cell.likeBtn.tintColor = willLike ? .appColor(.rosePink) : .white
+                    
+                    let goodsType = (indexPath.item, item)
                     if willLike {
-                        self?.reactor?.action.onNext(.addLikeGood(item))
+                        self?.reactor?.action.onNext(.addLikeGood(goodsType))
                     } else {
-                        self?.reactor?.action.onNext(.removeLikeGood(item))
+                        self?.reactor?.action.onNext(.removeLikeGood(goodsType))
                     }
                 })
                 .disposed(by: cell.disposeBag)

@@ -9,13 +9,14 @@ import Foundation
 import ReactorKit
 
 class HomeReactor: Reactor {
+    typealias GoodsIndexType = (itemIndex: Int, item: GoodsItemModel)
     let disposeBag = DisposeBag()
     
     enum Action {
         case initialFetch
         case pagingGoods
-        case addLikeGood(GoodsItemModel)
-        case removeLikeGood(GoodsItemModel)
+        case addLikeGood(GoodsIndexType)
+        case removeLikeGood(GoodsIndexType)
     }
     
     enum Mutation {
@@ -52,8 +53,8 @@ class HomeReactor: Reactor {
                 .just(.setPaging(false))
             ])
             
-        case .addLikeGood(let item):
-            return addLikeItem(item)
+        case .addLikeGood(let goodsType):
+            return addLikeItem(goodsType)
             
         case .removeLikeGood(let item):
             return removeLikeItem(item)
@@ -95,7 +96,10 @@ extension HomeReactor {
         return HomeApi().getHomeList()
             .flatMap{ res -> Observable<Mutation> in
                 let bannerList = res.banners?.compactMap { BannerItemModel(from: $0) } ?? []
-                let goodsList = res.goods?.compactMap { GoodsItemModel(from: $0, isLikeAvailable: true) } ?? []
+                let likeGoodsList = UserDefaultsManager.likeList
+                let goodsList = res.goods?.compactMap { GoodsItemModel(from: $0,
+                                                                       isLikeAvailable: true,
+                                                                       likeList: likeGoodsList) } ?? []
                 
                 return Observable.merge(
                     .just(.setBannerList(bannerList)),
@@ -113,10 +117,13 @@ extension HomeReactor {
         return HomeApi().getGoodsList(lastId: lastId)
             .flatMap{ [weak self] res -> Observable<Mutation> in
                 guard let self = self else { return .empty() }
-                let goodsList = res.goods?.compactMap { GoodsItemModel(from: $0, isLikeAvailable: true) } ?? []
+                let likeGoodsList = UserDefaultsManager.likeList
+                let goodsList = res.goods?.compactMap{ GoodsItemModel(from: $0,
+                                                                      isLikeAvailable: true,
+                                                                      likeList: likeGoodsList) } ?? []
                 let lastGoodsCount = self.currentState.goodsList.count
                 let insertedItems = Array(lastGoodsCount..<(lastGoodsCount + goodsList.count))
-                        
+                
                 return Observable.concat([
                     .merge(.just(.appendGoodsList(goodsList)),
                            .just(.setLastGoodsId(goodsList.last?.id))),
@@ -128,12 +135,34 @@ extension HomeReactor {
             }
     }
     
-    func addLikeItem(_ item: GoodsItemModel) -> Observable<Mutation> {
-        return .empty()
+    func addLikeItem(_ itemType: GoodsIndexType) -> Observable<Mutation> {
+        let index = itemType.itemIndex
+        var item = itemType.item
+        item.isLike = true
+        
+        var currentGoods = currentState.goodsList
+        currentGoods[index] = item
+        
+        var currentLikeGoods = UserDefaultsManager.likeList ?? []
+        currentLikeGoods.append(item)
+        UserDefaultsManager.likeList = currentLikeGoods
+        
+        return .just(.setGoodsList(currentGoods))
     }
     
-    func removeLikeItem(_ item: GoodsItemModel) -> Observable<Mutation> {
-        return .empty()
+    func removeLikeItem(_ itemType: GoodsIndexType) -> Observable<Mutation> {
+        let index = itemType.itemIndex
+        var item = itemType.item
+        item.isLike = false
+        
+        var currentGoods = currentState.goodsList
+        currentGoods[index] = item
+        
+        var currentLikeGoods = UserDefaultsManager.likeList ?? []
+        currentLikeGoods.removeAll(where: { $0.id == item.id })
+        UserDefaultsManager.likeList = currentLikeGoods
+        
+        return .just(.setGoodsList(currentGoods))
     }
     
     func reloadAll() -> Observable<Mutation> {

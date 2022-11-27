@@ -18,7 +18,7 @@ struct BannerItemModel {
     }
 }
 
-struct GoodsItemModel {
+struct GoodsItemModel: Codable {
     var id: Int?
     var name: String
     var image: String
@@ -30,7 +30,7 @@ struct GoodsItemModel {
     var isLike: Bool = false
     var likeAvailable: Bool = true
     
-    init(from res: HomeListGoodResponse?, isLikeAvailable: Bool) {
+    init(from res: HomeListGoodResponse?, isLikeAvailable: Bool, likeList likeItemList: [GoodsItemModel]? = []) {
         self.id = res?.id
         self.name = res?.name ?? ""
         self.image = res?.image ?? ""
@@ -43,5 +43,6 @@ struct GoodsItemModel {
         self.actualPrice = actual
         self.discountPercent = (actual == 0) ? 0 : Int(ceil(Double((price * 100) / actual)))
         self.likeAvailable = isLikeAvailable
+        self.isLike = !(likeItemList?.first(where: { $0.id == res?.id }) == nil)
     }
 }
