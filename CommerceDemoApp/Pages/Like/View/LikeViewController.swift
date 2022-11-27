@@ -58,6 +58,7 @@ class LikeViewController: UIViewController, View {
                 cellType: GoodsListCollectionViewCell.self)
             ) { indexPath, item, cell in
                 cell.cellModel = item
+                cell.likeBtn.isHidden = true
             }
             .disposed(by: disposeBag)
     }

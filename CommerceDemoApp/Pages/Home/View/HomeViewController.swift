@@ -126,7 +126,7 @@ extension HomeViewController: UICollectionViewDataSource {
         case .goodsList:
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: GoodsListCollectionViewCell.identifier, for: indexPath) as? GoodsListCollectionViewCell else { return UICollectionViewCell() }
             cell.cellModel = state?.goodsList[indexPath.item]
-            
+            cell.likeBtn.isHidden = false
             cell.likeBtn.rx.tap
                 .asDriver()
                 .drive(onNext: {[weak self] in

@@ -17,32 +17,3 @@ struct BannerItemModel {
         self.image = res?.image ?? ""
     }
 }
-
-struct GoodsItemModel: Codable {
-    var id: Int?
-    var name: String
-    var image: String
-    var isNew: Bool
-    var sellCount: Int
-    var actualPrice: Int
-    var price: Int
-    var discountPercent: Int
-    var isLike: Bool = false
-    var likeAvailable: Bool = true
-    
-    init(from res: HomeListGoodResponse?, isLikeAvailable: Bool, likeList likeItemList: [GoodsItemModel]? = []) {
-        self.id = res?.id
-        self.name = res?.name ?? ""
-        self.image = res?.image ?? ""
-        self.isNew = res?.is_new ?? false
-        self.sellCount = res?.sell_count ?? 0
-    
-        let price = res?.price ?? 0
-        let actual = res?.actual_price ?? 0
-        self.price = price
-        self.actualPrice = actual
-        self.discountPercent = (actual == 0) ? 0 : Int(ceil(Double((price * 100) / actual)))
-        self.likeAvailable = isLikeAvailable
-        self.isLike = !(likeItemList?.first(where: { $0.id == res?.id }) == nil)
-    }
-}

@@ -52,17 +52,6 @@ class LikeReactor: Reactor {
 }
 
 extension LikeReactor {
-    func fetchGoodsList() -> Observable<Mutation> {
-        return HomeApi().getHomeList()
-            .flatMap{ res -> Observable<Mutation> in
-                let goodsList = res.goods?.compactMap { GoodsItemModel(from: $0, isLikeAvailable: false) } ?? []
-                return .just(.setGoodsList(goodsList))
-            }
-            .catch {
-                return Observable.error($0)
-            }
-    }
-    
     func reloadAll() -> Observable<Mutation> {
         return .concat([
             .just(.setReload(true)),

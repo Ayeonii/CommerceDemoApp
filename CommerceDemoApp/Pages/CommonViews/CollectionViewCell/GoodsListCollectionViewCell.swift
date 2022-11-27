@@ -10,6 +10,35 @@ import RxSwift
 import SnapKit
 import Then
 
+
+struct GoodsItemModel: Codable {
+    var id: Int?
+    var name: String
+    var image: String
+    var isNew: Bool
+    var sellCount: Int
+    var actualPrice: Int
+    var price: Int
+    var discountPercent: Int
+    var isLike: Bool = false
+    
+    init(from res: HomeListGoodResponse?, likeList likeItemList: [GoodsItemModel]? = []) {
+        self.id = res?.id
+        self.name = res?.name ?? ""
+        self.image = res?.image ?? ""
+        self.isNew = res?.is_new ?? false
+        self.sellCount = res?.sell_count ?? 0
+    
+        let price = res?.price ?? 0
+        let actual = res?.actual_price ?? 0
+        self.price = price
+        self.actualPrice = actual
+        self.discountPercent = (actual == 0) ? 0 : (100 - Int(ceil(Double((price * 100) / actual))))
+        self.isLike = !(likeItemList?.first(where: { $0.id == res?.id }) == nil)
+    }
+}
+
+
 class GoodsListCollectionViewCell: UICollectionViewCell {
     static let identifier = "GoodsListCollectionViewCell"
     
@@ -63,20 +92,7 @@ class GoodsListCollectionViewCell: UICollectionViewCell {
     var cellModel: GoodsItemModel? {
         didSet {
             guard let model = cellModel else { return }
-            let isDiscount = (model.discountPercent > 0)
-            self.goodsImage.kf.setImage(with: URL(string: model.image))
-            self.discountLabel.isHidden = !isDiscount
-            self.discountLabel.text = "\(model.discountPercent)%"
-            self.priceLabel.text = model.price.toDecimal()
-            self.nameLabel.text = model.name
-            self.sellCountLabel.isHidden = !(model.sellCount >= 10)
-            self.sellCountLabel.text = model.sellCount.toDecimal() + "개 구매중"
-            self.newLabel.isHidden = !model.isNew
-            self.likeBtn.isHidden = !model.likeAvailable
-            self.likeBtn.isSelected = model.isLike
-            
-            self.updatePriceLayout(isDiscount: isDiscount)
-            self.updateNewBadgeLayout(isNew: model.isNew)
+            self.updateUI(model: model)
         }
     }
     
@@ -93,6 +109,23 @@ class GoodsListCollectionViewCell: UICollectionViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         disposeBag = DisposeBag()
+    }
+    
+    func updateUI(model: GoodsItemModel) {
+        let isDiscount = (model.discountPercent > 0)
+        self.goodsImage.kf.setImage(with: URL(string: model.image))
+        self.discountLabel.isHidden = !isDiscount
+        self.discountLabel.text = "\(model.discountPercent)%"
+        self.priceLabel.text = model.price.toDecimal()
+        self.nameLabel.text = model.name
+        self.sellCountLabel.isHidden = !(model.sellCount >= 10)
+        self.sellCountLabel.text = model.sellCount.toDecimal() + "개 구매중"
+        self.newLabel.isHidden = !model.isNew
+        self.likeBtn.isSelected = model.isLike
+        self.likeBtn.tintColor = model.isLike ? UIColor.appColor(.rosePink) : UIColor.white
+        
+        self.updatePriceLayout(isDiscount: isDiscount)
+        self.updateNewBadgeLayout(isNew: model.isNew)
     }
 }
 
@@ -154,8 +187,18 @@ extension GoodsListCollectionViewCell {
     }
     
     func updatePriceLayout(isDiscount: Bool) {
-        priceLabel.snp.updateConstraints {
-            $0.left.equalTo(discountLabel.snp.right).offset(isDiscount ? 3 : 0)
+        if isDiscount {
+            priceLabel.snp.remakeConstraints {
+                $0.left.equalTo(discountLabel.snp.right).offset(3)
+                $0.top.height.equalTo(discountLabel)
+                $0.right.lessThanOrEqualTo(self).offset(-15)
+            }
+        } else {
+            priceLabel.snp.remakeConstraints {
+                $0.left.equalTo(goodsImage.snp.right).offset(10)
+                $0.top.height.equalTo(discountLabel)
+                $0.right.lessThanOrEqualTo(self).offset(-15)
+            }
         }
     }
     

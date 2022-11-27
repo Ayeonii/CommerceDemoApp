@@ -97,9 +97,7 @@ extension HomeReactor {
             .flatMap{ res -> Observable<Mutation> in
                 let bannerList = res.banners?.compactMap { BannerItemModel(from: $0) } ?? []
                 let likeGoodsList = UserDefaultsManager.likeList
-                let goodsList = res.goods?.compactMap { GoodsItemModel(from: $0,
-                                                                       isLikeAvailable: true,
-                                                                       likeList: likeGoodsList) } ?? []
+                let goodsList = res.goods?.compactMap { GoodsItemModel(from: $0, likeList: likeGoodsList) } ?? []
                 
                 return Observable.merge(
                     .just(.setBannerList(bannerList)),
@@ -118,9 +116,7 @@ extension HomeReactor {
             .flatMap{ [weak self] res -> Observable<Mutation> in
                 guard let self = self else { return .empty() }
                 let likeGoodsList = UserDefaultsManager.likeList
-                let goodsList = res.goods?.compactMap{ GoodsItemModel(from: $0,
-                                                                      isLikeAvailable: true,
-                                                                      likeList: likeGoodsList) } ?? []
+                let goodsList = res.goods?.compactMap{ GoodsItemModel(from: $0, likeList: likeGoodsList) } ?? []
                 let lastGoodsCount = self.currentState.goodsList.count
                 let insertedItems = Array(lastGoodsCount..<(lastGoodsCount + goodsList.count))
                 
@@ -144,7 +140,7 @@ extension HomeReactor {
         currentGoods[index] = item
         
         var currentLikeGoods = UserDefaultsManager.likeList ?? []
-        currentLikeGoods.append(item)
+        currentLikeGoods.insert(item, at: 0)
         UserDefaultsManager.likeList = currentLikeGoods
         
         return .just(.setGoodsList(currentGoods))
@@ -159,7 +155,9 @@ extension HomeReactor {
         currentGoods[index] = item
         
         var currentLikeGoods = UserDefaultsManager.likeList ?? []
-        currentLikeGoods.removeAll(where: { $0.id == item.id })
+        if let matchedIndex = currentLikeGoods.firstIndex(where: { $0.id == item.id }) {
+            currentLikeGoods.remove(at: matchedIndex)
+        }
         UserDefaultsManager.likeList = currentLikeGoods
         
         return .just(.setGoodsList(currentGoods))
