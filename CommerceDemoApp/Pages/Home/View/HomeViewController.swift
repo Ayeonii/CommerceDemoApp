@@ -42,8 +42,13 @@ class HomeViewController: UIViewController, View {
     }
     
     func bind(reactor: HomeReactor) {
+        self.bindAction(reactor)
         self.bindState(reactor)
         reactor.action.onNext(.initialFetch)
+    }
+    
+    private func bindAction(_ reactor: HomeReactor) {
+        
     }
 
     private func bindState(_ reactor: HomeReactor) {

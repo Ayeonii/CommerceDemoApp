@@ -45,4 +45,3 @@ struct GoodsItemModel {
         self.likeAvailable = isLikeAvailable
     }
 }
-

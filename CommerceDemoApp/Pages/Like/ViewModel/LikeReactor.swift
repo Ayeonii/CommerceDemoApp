@@ -6,4 +6,66 @@
 //
 
 import Foundation
+import ReactorKit
+
+class LikeReactor: Reactor {
+    let disposeBag = DisposeBag()
+    
+    enum Action {
+        case initialFetch
+    }
+    
+    enum Mutation {
+        case setGoodsList([GoodsItemModel])
+        case setReload(Bool)
+    }
+    
+    struct State {
+        @Pulse var goodsList: [GoodsItemModel] = []
+        var shouldReload: Bool = false
+    }
+    
+    let initialState = State()
+    
+    func mutate(action: Action) -> Observable<Mutation> {
+        switch action {
+        case .initialFetch:
+            return Observable.concat([fetchGoodsList(), reloadAll()])
+        }
+    }
+    
+    func reduce(state: State, mutation: Mutation) -> State {
+        var newState = state
+        
+        switch mutation {
+        case .setGoodsList(let goodsList):
+            newState.goodsList = goodsList
+   
+        case .setReload(let shouldReload):
+            newState.shouldReload = shouldReload
+        }
+        
+        return newState
+    }
+}
+
+extension LikeReactor {
+    func fetchGoodsList() -> Observable<Mutation> {
+        return HomeApi().getHomeList()
+            .flatMap{ res -> Observable<Mutation> in
+                let goodsList = res.goods?.compactMap { GoodsItemModel(from: $0, isLikeAvailable: false) } ?? []
+                return .just(.setGoodsList(goodsList))
+            }
+            .catch {
+                return Observable.error($0)
+            }
+    }
+    
+    func reloadAll() -> Observable<Mutation> {
+        return .concat([
+            .just(.setReload(true)),
+            .just(.setReload(false))
+        ])
+    }
+}
 
