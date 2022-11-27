@@ -48,10 +48,34 @@ class HomeViewController: UIViewController, View {
     }
     
     private func bindAction(_ reactor: HomeReactor) {
-        
+        collectionView.rx.contentOffset
+            .filter { [weak self] point in
+                guard let self = self,
+                      self.state?.isPaging == false
+                else { return false }
+
+                let offset = point.y
+                let collectionViewContentSizeY = self.collectionView.contentSize.height
+                let paginationY = collectionViewContentSizeY * 0.4
+                return offset > collectionViewContentSizeY - paginationY
+            }
+            .map { _ in HomeReactor.Action.pagingGoods }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
     }
 
     private func bindState(_ reactor: HomeReactor) {
+        reactor.pulse(\.$insertGoodsItems)
+            .filter{ !$0.isEmpty }
+            .asDriver { _ in .never() }
+            .drive(onNext: { [weak self] rows in
+                let insertIndexPaths: [IndexPath] = rows.map {IndexPath(row: $0, section: HomeSectionType.goodsList.rawValue)}
+                self?.collectionView.performBatchUpdates({
+                    self?.collectionView.insertItems(at: insertIndexPaths)
+                })
+            })
+            .disposed(by: disposeBag)
+        
         reactor.state
             .filter{ $0.shouldReload }
             .observe(on: MainScheduler.instance)
@@ -71,7 +95,7 @@ extension HomeViewController {
     }
 }
 
-extension HomeViewController: UICollectionViewDelegate, UICollectionViewDataSource {
+extension HomeViewController: UICollectionViewDelegate {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return HomeSectionType.allCases.count
     }
@@ -86,7 +110,10 @@ extension HomeViewController: UICollectionViewDelegate, UICollectionViewDataSour
             return 1
         }
     }
-    
+}
+
+extension HomeViewController: UICollectionViewDataSource {
+
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let sectionType = HomeSectionType(rawValue: indexPath.section)
         

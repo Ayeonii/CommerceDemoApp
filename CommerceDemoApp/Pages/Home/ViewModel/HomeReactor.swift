@@ -23,14 +23,18 @@ class HomeReactor: Reactor {
         case setGoodsList([GoodsItemModel])
         case setLastGoodsId(Int?)
         case appendGoodsList([GoodsItemModel])
+        case setInsertGoodsItems([Int])
         case setReload(Bool)
+        case setPaging(Bool)
     }
     
     struct State {
         var bannerList: [BannerItemModel] = []
         var goodsList: [GoodsItemModel] = []
         var goodsLastId: Int?
+        @Pulse var insertGoodsItems: [Int] = []
         var shouldReload: Bool = false
+        var isPaging: Bool = false
     }
     
     let initialState = State()
@@ -41,7 +45,12 @@ class HomeReactor: Reactor {
             return Observable.concat([fetchHomeList(), reloadAll()])
             
         case .pagingGoods:
-            return fetchGoodsListWithPaging()
+            guard let lastId = currentState.goodsLastId else { return .empty() }
+            return Observable.concat([
+                .just(.setPaging(true)),
+                fetchGoodsListWithPaging(lastId),
+                .just(.setPaging(false))
+            ])
             
         case .addLikeGood(let item):
             return addLikeItem(item)
@@ -67,8 +76,14 @@ class HomeReactor: Reactor {
         case .setLastGoodsId(let id):
             newState.goodsLastId = id
             
+        case .setInsertGoodsItems(let items):
+            newState.insertGoodsItems = items
+            
         case .setReload(let shouldReload):
             newState.shouldReload = shouldReload
+            
+        case .setPaging(let isPaging):
+            newState.isPaging = isPaging
         }
         
         return newState
@@ -94,16 +109,19 @@ extension HomeReactor {
             }
     }
     
-    func fetchGoodsListWithPaging() -> Observable<Mutation> {
-        guard let lastId = currentState.goodsLastId else { return .empty() }
-        
+    func fetchGoodsListWithPaging(_ lastId: Int) -> Observable<Mutation> {
         return HomeApi().getGoodsList(lastId: lastId)
-            .flatMap{ res -> Observable<Mutation> in
+            .flatMap{ [weak self] res -> Observable<Mutation> in
+                guard let self = self else { return .empty() }
                 let goodsList = res.goods?.compactMap { GoodsItemModel(from: $0, isLikeAvailable: true) } ?? []
-                return Observable.merge(
-                    .just(.setGoodsList(goodsList)),
-                    .just(.setLastGoodsId(goodsList.last?.id))
-                )
+                let lastGoodsCount = self.currentState.goodsList.count
+                let insertedItems = Array(lastGoodsCount..<(lastGoodsCount + goodsList.count))
+                        
+                return Observable.concat([
+                    .merge(.just(.appendGoodsList(goodsList)),
+                           .just(.setLastGoodsId(goodsList.last?.id))),
+                    .just(.setInsertGoodsItems(insertedItems))
+                ])
             }
             .catch {
                 return Observable.error($0)
