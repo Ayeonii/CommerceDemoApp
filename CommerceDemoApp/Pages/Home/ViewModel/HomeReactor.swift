@@ -27,6 +27,7 @@ class HomeReactor: Reactor {
         case setInsertGoodsItems([Int])
         case setReload(Bool)
         case setPaging(Bool)
+        case setRefreshing(Bool)
     }
     
     struct State {
@@ -36,6 +37,7 @@ class HomeReactor: Reactor {
         @Pulse var insertGoodsItems: [Int] = []
         var shouldReload: Bool = false
         var isPaging: Bool = false
+        var isRefreshing: Bool = true
     }
     
     let initialState = State()
@@ -43,7 +45,10 @@ class HomeReactor: Reactor {
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .initialFetch:
-            return Observable.concat([fetchHomeList(), reloadAll()])
+            return Observable.concat([
+                fetchHomeList(),
+                reloadAll()
+            ])
             
         case .pagingGoods:
             guard let lastId = currentState.goodsLastId else { return .empty() }
@@ -85,6 +90,9 @@ class HomeReactor: Reactor {
             
         case .setPaging(let isPaging):
             newState.isPaging = isPaging
+            
+        case .setRefreshing(let isRefreshing):
+            newState.isRefreshing = isRefreshing
         }
         
         return newState

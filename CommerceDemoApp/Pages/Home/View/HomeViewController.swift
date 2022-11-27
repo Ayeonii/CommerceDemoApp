@@ -23,6 +23,8 @@ class HomeViewController: UIViewController, View {
         return self.reactor?.currentState
     }
     
+    let refreshControl = UIRefreshControl()
+    
     lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: .init()).then {
         let layout = UICollectionViewFlowLayout()
         layout.minimumLineSpacing = 2
@@ -33,6 +35,7 @@ class HomeViewController: UIViewController, View {
         $0.collectionViewLayout = layout
         $0.register(SwipeBannerCollectionViewCell.self, forCellWithReuseIdentifier: SwipeBannerCollectionViewCell.identifier)
         $0.register(GoodsListCollectionViewCell.self, forCellWithReuseIdentifier: GoodsListCollectionViewCell.identifier)
+        $0.refreshControl = self.refreshControl
     }
     
     override func viewDidLoad() {
@@ -48,6 +51,12 @@ class HomeViewController: UIViewController, View {
     }
     
     private func bindAction(_ reactor: HomeReactor) {
+        refreshControl.rx.controlEvent(.valueChanged)
+            .delay(.milliseconds(500), scheduler: MainScheduler.asyncInstance)
+            .map { _ in HomeReactor.Action.initialFetch }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
         collectionView.rx.contentOffset
             .filter { [weak self] point in
                 guard let self = self,
@@ -80,6 +89,7 @@ class HomeViewController: UIViewController, View {
             .filter{ $0.shouldReload }
             .observe(on: MainScheduler.instance)
             .bind(onNext: {[weak self] _ in
+                self?.refreshControl.endRefreshing()
                 self?.collectionView.reloadData()
             })
             .disposed(by: disposeBag)
