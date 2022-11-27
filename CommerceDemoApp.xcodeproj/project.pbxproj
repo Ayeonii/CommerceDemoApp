@@ -283,7 +283,7 @@
 		D6299E7A29321A38004139DD /* CommonViews */ = {
 			isa = PBXGroup;
 			children = (
-				D6C7BD792933358500AD4A8C /* CommonLayout */,
+				D6C7BD792933358500AD4A8C /* CollectionViewLayout */,
 				D6299E7B29321A44004139DD /* CollectionViewCell */,
 			);
 			path = CommonViews;
@@ -305,12 +305,12 @@
 			path = UserDefaults;
 			sourceTree = "<group>";
 		};
-		D6C7BD792933358500AD4A8C /* CommonLayout */ = {
+		D6C7BD792933358500AD4A8C /* CollectionViewLayout */ = {
 			isa = PBXGroup;
 			children = (
 				D6C7BD772933348700AD4A8C /* GoodsLayout.swift */,
 			);
-			path = CommonLayout;
+			path = CollectionViewLayout;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

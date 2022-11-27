@@ -91,7 +91,6 @@ class HttpAPIManager {
                     case (200..<300):
                         do {
                             let result = try JSONDecoder().decode(responseClass, from: data)
-                            print("result: ->", result)
                             observer.onNext(result)
                             observer.onCompleted()
                         } catch {

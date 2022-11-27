@@ -9,7 +9,7 @@ import UIKit
 import RxSwift
 import SnapKit
 import Then
-
+import Kingfisher
 
 struct GoodsItemModel: Codable {
     var id: Int?
@@ -108,6 +108,7 @@ class GoodsListCollectionViewCell: UICollectionViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
+        goodsImage.kf.cancelDownloadTask()
         disposeBag = DisposeBag()
     }
     
