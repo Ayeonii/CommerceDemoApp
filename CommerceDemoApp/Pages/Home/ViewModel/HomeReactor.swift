@@ -80,7 +80,7 @@ extension HomeReactor {
         return HomeApi().getHomeList()
             .flatMap{ res -> Observable<Mutation> in
                 let bannerList = res.banners?.compactMap { BannerItemModel(from: $0) } ?? []
-                let goodsList = res.goods?.compactMap { GoodsItemModel(from: $0) } ?? []
+                let goodsList = res.goods?.compactMap { GoodsItemModel(from: $0, isLikeAvailable: true) } ?? []
                 
                 return Observable.merge(
                     .just(.setBannerList(bannerList)),
@@ -99,7 +99,7 @@ extension HomeReactor {
         
         return HomeApi().getGoodsList(lastId: lastId)
             .flatMap{ res -> Observable<Mutation> in
-                let goodsList = res.goods?.compactMap { GoodsItemModel(from: $0) } ?? []
+                let goodsList = res.goods?.compactMap { GoodsItemModel(from: $0, isLikeAvailable: true) } ?? []
                 return Observable.merge(
                     .just(.setGoodsList(goodsList)),
                     .just(.setLastGoodsId(goodsList.last?.id))

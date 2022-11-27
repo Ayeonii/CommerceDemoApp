@@ -30,7 +30,7 @@ struct GoodsItemModel {
     var isLike: Bool = false
     var likeAvailable: Bool = true
     
-    init(from res: HomeListGoodResponse?) {
+    init(from res: HomeListGoodResponse?, isLikeAvailable: Bool) {
         self.id = res?.id
         self.name = res?.name ?? ""
         self.image = res?.image ?? ""
@@ -42,6 +42,7 @@ struct GoodsItemModel {
         self.price = price
         self.actualPrice = actual
         self.discountPercent = (actual == 0) ? 0 : Int(ceil(Double((price * 100) / actual)))
+        self.likeAvailable = isLikeAvailable
     }
 }
 

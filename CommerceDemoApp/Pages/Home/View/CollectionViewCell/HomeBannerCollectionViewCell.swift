@@ -13,6 +13,8 @@ import SnapKit
 import Then
 
 class SwipeBannerCollectionViewCell: UICollectionViewCell {
+    static let identifier = "SwipeBannerCollectionViewCell"
+    
     var disposeBag = DisposeBag()
     
     lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: .init()).then {
@@ -99,7 +101,6 @@ class SwipeBannerCollectionViewCell: UICollectionViewCell {
         self.addSubview(countView)
         countView.addSubview(countLabel)
         
-        let diviceWidth = UIScreen.main.bounds.width
         collectionView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
@@ -128,10 +129,3 @@ extension SwipeBannerCollectionViewCell: UICollectionViewDelegate {
         countLabel.text = "\(currentIndex)/\(cellModel?.count ?? 0)"
     }
 }
-
-extension SwipeBannerCollectionViewCell: UICollectionViewDelegateFlowLayout {
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: collectionView.bounds.width, height: collectionView.bounds.height)
-    }
-}
-

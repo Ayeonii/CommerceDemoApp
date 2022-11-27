@@ -26,13 +26,13 @@ class HomeViewController: UIViewController, View {
     lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: .init()).then {
         let layout = UICollectionViewFlowLayout()
         layout.minimumLineSpacing = 2
-        
-        $0.backgroundColor = UIColor(rgb: 0xF7F7F7)
+    
         $0.delegate = self
         $0.dataSource = self
+        $0.backgroundColor = UIColor(rgb: 0xF7F7F7)
         $0.collectionViewLayout = layout
-        $0.register(SwipeBannerCollectionViewCell.self, forCellWithReuseIdentifier: "SwipeBannerCollectionViewCell")
-        $0.register(GoodsListCollectionViewCell.self, forCellWithReuseIdentifier: "GoodsListCollectionViewCell")
+        $0.register(SwipeBannerCollectionViewCell.self, forCellWithReuseIdentifier: SwipeBannerCollectionViewCell.identifier)
+        $0.register(GoodsListCollectionViewCell.self, forCellWithReuseIdentifier: GoodsListCollectionViewCell.identifier)
     }
     
     override func viewDidLoad() {
@@ -42,15 +42,10 @@ class HomeViewController: UIViewController, View {
     }
     
     func bind(reactor: HomeReactor) {
-        self.bindAction(reactor)
         self.bindState(reactor)
         reactor.action.onNext(.initialFetch)
     }
-    
-    private func bindAction(_ reactor: HomeReactor) {
-        
-    }
-    
+
     private func bindState(_ reactor: HomeReactor) {
         reactor.state
             .filter{ $0.shouldReload }
@@ -92,12 +87,12 @@ extension HomeViewController: UICollectionViewDelegate, UICollectionViewDataSour
         
         switch sectionType {
         case .banner:
-            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "SwipeBannerCollectionViewCell", for: indexPath) as? SwipeBannerCollectionViewCell else { return UICollectionViewCell() }
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: SwipeBannerCollectionViewCell.identifier, for: indexPath) as? SwipeBannerCollectionViewCell else { return UICollectionViewCell() }
             cell.cellModel = state?.bannerList
             return cell
             
         case .goodsList:
-            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "GoodsListCollectionViewCell", for: indexPath) as? GoodsListCollectionViewCell else { return UICollectionViewCell() }
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: GoodsListCollectionViewCell.identifier, for: indexPath) as? GoodsListCollectionViewCell else { return UICollectionViewCell() }
             cell.cellModel = state?.goodsList[indexPath.item]
             
             cell.likeBtn.rx.tap

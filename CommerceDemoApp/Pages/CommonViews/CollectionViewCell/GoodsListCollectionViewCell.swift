@@ -11,6 +11,8 @@ import SnapKit
 import Then
 
 class GoodsListCollectionViewCell: UICollectionViewCell {
+    static let identifier = "GoodsListCollectionViewCell"
+    
     var disposeBag = DisposeBag()
     
     var goodsImage = UIImageView().then {
