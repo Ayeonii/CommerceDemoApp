@@ -17,13 +17,8 @@ class LikeViewController: UIViewController, View {
         return self.reactor?.currentState
     }
     
-    lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: .init()).then {
-        let layout = UICollectionViewFlowLayout()
-        layout.minimumLineSpacing = 2
-        
-        $0.delegate = self
+    lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: generateCollectionViewLayout()).then {
         $0.backgroundColor = UIColor(rgb: 0xF7F7F7)
-        $0.collectionViewLayout = layout
         $0.register(GoodsListCollectionViewCell.self, forCellWithReuseIdentifier: GoodsListCollectionViewCell.identifier)
     }
     
@@ -71,17 +66,8 @@ extension LikeViewController {
             make.edges.equalTo(view.safeAreaLayoutGuide)
         }
     }
-}
-
-extension LikeViewController: UICollectionViewDelegateFlowLayout {
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let deviceWidth = UIScreen.main.bounds.width
-        let estimateHeight = 600.0
-        let sizingCell = GoodsListCollectionViewCell(frame: CGRect(x: 0, y: 0, width: deviceWidth, height: estimateHeight))
-        sizingCell.cellModel = state?.goodsList[indexPath.item]
-        sizingCell.layoutIfNeeded()
-        
-        let estimatedSize = sizingCell.systemLayoutSizeFitting(CGSize(width: deviceWidth, height: estimateHeight))
-        return CGSize(width: deviceWidth, height: estimatedSize.height)
+    
+    func generateCollectionViewLayout() -> UICollectionViewLayout {
+        return UICollectionViewCompositionalLayout(section: GoodsLayout.generateListLayout())
     }
 }

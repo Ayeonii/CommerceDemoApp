@@ -25,14 +25,10 @@ class HomeViewController: UIViewController, View {
     
     let refreshControl = UIRefreshControl()
     
-    lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: .init()).then {
-        let layout = UICollectionViewFlowLayout()
-        layout.minimumLineSpacing = 2
-    
+    lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: configureCollectionViewLayout()).then {
         $0.delegate = self
         $0.dataSource = self
         $0.backgroundColor = UIColor(rgb: 0xF7F7F7)
-        $0.collectionViewLayout = layout
         $0.register(SwipeBannerCollectionViewCell.self, forCellWithReuseIdentifier: SwipeBannerCollectionViewCell.identifier)
         $0.register(GoodsListCollectionViewCell.self, forCellWithReuseIdentifier: GoodsListCollectionViewCell.identifier)
         $0.refreshControl = self.refreshControl
@@ -103,6 +99,48 @@ extension HomeViewController {
             make.edges.equalTo(view.safeAreaLayoutGuide)
         }
     }
+    
+    func configureCollectionViewLayout() -> UICollectionViewLayout {
+        return UICollectionViewCompositionalLayout { [weak self] (sectionIndex: Int,
+                                                      layoutEnvironment: NSCollectionLayoutEnvironment) -> NSCollectionLayoutSection? in
+            
+            let sectionType = HomeSectionType(rawValue: sectionIndex)
+            switch sectionType {
+            case .banner:
+                return self?.generateBannerLayout()
+            default:
+                return GoodsLayout.generateListLayout()
+            }
+        }
+    }
+    
+    func generateBannerLayout() -> NSCollectionLayoutSection {
+        let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .fractionalHeight(1.0))
+        let item = NSCollectionLayoutItem(layoutSize: itemSize)
+        
+        let deviceWidth = UIScreen.main.bounds.width
+        let groupSize = NSCollectionLayoutSize(widthDimension: .absolute(deviceWidth), heightDimension: .absolute(deviceWidth * (300/375)))
+        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitem: item, count: 1)
+        
+        let section = NSCollectionLayoutSection(group: group)
+        section.orthogonalScrollingBehavior = .none
+        
+        return section
+    }
+    
+    func generateGoodsLayout() -> NSCollectionLayoutSection {
+        let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .estimated(300))
+        let item = NSCollectionLayoutItem(layoutSize: itemSize)
+        
+        let groupSize = NSCollectionLayoutSize(widthDimension: .absolute(UIScreen.main.bounds.width), heightDimension: .estimated(300))
+        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitem: item, count: 1)
+        
+        let section = NSCollectionLayoutSection(group: group)
+        section.orthogonalScrollingBehavior = .none
+        section.interGroupSpacing = 2
+        
+        return section
+    }
 }
 
 extension HomeViewController: UICollectionViewDelegate {
@@ -158,27 +196,6 @@ extension HomeViewController: UICollectionViewDataSource {
             
         default:
             return UICollectionViewCell()
-        }
-    }
-}
-
-extension HomeViewController: UICollectionViewDelegateFlowLayout {
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let sectionType = HomeSectionType(rawValue: indexPath.section)
-        let deviceWidth = UIScreen.main.bounds.width
-        
-        switch sectionType {
-        case .banner:
-            return CGSize(width: deviceWidth, height: deviceWidth * (300/375))
-            
-        default:
-            let estimateHeight = 600.0
-            let sizingCell = GoodsListCollectionViewCell(frame: CGRect(x: 0, y: 0, width: deviceWidth, height: estimateHeight))
-            sizingCell.cellModel = state?.goodsList[indexPath.item]
-            sizingCell.layoutIfNeeded()
-            
-            let estimatedSize = sizingCell.systemLayoutSizeFitting(CGSize(width: deviceWidth, height: estimateHeight))
-            return CGSize(width: deviceWidth, height: estimatedSize.height)
         }
     }
 }
