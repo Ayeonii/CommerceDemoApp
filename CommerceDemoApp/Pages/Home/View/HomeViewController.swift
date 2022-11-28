@@ -11,11 +11,6 @@ import RxCocoa
 import ReactorKit
 import Then
 
-enum HomeSectionType: Int, CaseIterable {
-    case banner = 0
-    case goodsList = 1
-}
-
 class HomeViewController: UIViewController, View {
     var disposeBag = DisposeBag()
     
@@ -166,10 +161,6 @@ extension HomeViewController: UICollectionViewDelegate {
             return 1
         }
     }
-    
-    func showErrorView() {
-        
-    }
 }
 
 extension HomeViewController: UICollectionViewDataSource {
@@ -187,13 +178,13 @@ extension HomeViewController: UICollectionViewDataSource {
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: GoodsListCollectionViewCell.identifier, for: indexPath) as? GoodsListCollectionViewCell else { return UICollectionViewCell() }
             cell.cellModel = state?.goodsList[indexPath.item]
             cell.likeBtn.isHidden = false
+            
             cell.likeBtn.rx.tap
                 .asDriver()
                 .drive(onNext: {[weak self] in
                     guard let item = cell.cellModel else { return }
                     let willLike = !cell.likeBtn.isSelected
-                    cell.likeBtn.isSelected = willLike
-                    cell.likeBtn.tintColor = willLike ? .appColor(.rosePink) : .white
+                    cell.setLike(willSelect: willLike)
                     
                     let goodsType = (indexPath.item, item)
                     if willLike {

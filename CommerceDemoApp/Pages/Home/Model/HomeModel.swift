@@ -7,6 +7,11 @@
 
 import Foundation
 
+enum HomeSectionType: Int, CaseIterable {
+    case banner = 0
+    case goodsList = 1
+}
+
 struct BannerItemModel {
     var id: Int?
     var image: String
