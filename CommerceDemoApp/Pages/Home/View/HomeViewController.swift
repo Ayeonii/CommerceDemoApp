@@ -89,6 +89,14 @@ class HomeViewController: UIViewController, View {
                 self?.collectionView.reloadData()
             })
             .disposed(by: disposeBag)
+        
+        reactor.state
+            .compactMap{ $0.errorResult }
+            .asDriver { _ in .never() }
+            .drive(onNext: { apiError in
+                print("에러발생", apiError)
+            })
+            .disposed(by: disposeBag)
     }
 }
 
@@ -157,6 +165,10 @@ extension HomeViewController: UICollectionViewDelegate {
         default:
             return 1
         }
+    }
+    
+    func showErrorView() {
+        
     }
 }
 

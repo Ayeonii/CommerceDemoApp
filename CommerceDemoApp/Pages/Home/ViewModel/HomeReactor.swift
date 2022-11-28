@@ -28,6 +28,7 @@ class HomeReactor: Reactor {
         case setReload(Bool)
         case setPaging(Bool)
         case setRefreshing(Bool)
+        case onError(ApiError?)
     }
     
     struct State {
@@ -38,6 +39,7 @@ class HomeReactor: Reactor {
         var shouldReload: Bool = false
         var isPaging: Bool = false
         var isRefreshing: Bool = true
+        var errorResult: ApiError?
     }
     
     let initialState = State()
@@ -93,6 +95,9 @@ class HomeReactor: Reactor {
             
         case .setRefreshing(let isRefreshing):
             newState.isRefreshing = isRefreshing
+            
+        case .onError(let error):
+            newState.errorResult = error
         }
         
         return newState
@@ -103,9 +108,9 @@ extension HomeReactor {
     func fetchHomeList() -> Observable<Mutation> {
         return HomeApi().getHomeList()
             .flatMap{ res -> Observable<Mutation> in
-                let bannerList = res.banners?.compactMap { BannerItemModel(from: $0) } ?? []
+                let bannerList = res.banners?.compactMap{ BannerItemModel(from: $0)} ?? []
                 let likeGoodsList = UserDefaultsManager.likeList
-                let goodsList = res.goods?.compactMap { GoodsItemModel(from: $0, likeList: likeGoodsList) } ?? []
+                let goodsList = res.goods?.compactMap{ GoodsItemModel(from: $0, likeList: likeGoodsList)} ?? []
                 
                 return Observable.merge(
                     .just(.setBannerList(bannerList)),
@@ -114,8 +119,10 @@ extension HomeReactor {
                 )
             }
             .catch {
-                print("error: \($0)")
-                return Observable.error($0)
+                return Observable.concat([
+                    .just(.onError($0 as? ApiError)),
+                    .just(.onError(nil))
+                ])
             }
     }
     
@@ -124,7 +131,7 @@ extension HomeReactor {
             .flatMap{ [weak self] res -> Observable<Mutation> in
                 guard let self = self else { return .empty() }
                 let likeGoodsList = UserDefaultsManager.likeList
-                let goodsList = res.goods?.compactMap{ GoodsItemModel(from: $0, likeList: likeGoodsList) } ?? []
+                let goodsList = res.goods?.compactMap{ GoodsItemModel(from: $0, likeList: likeGoodsList)} ?? []
                 let lastGoodsCount = self.currentState.goodsList.count
                 let insertedItems = Array(lastGoodsCount..<(lastGoodsCount + goodsList.count))
                 
@@ -135,7 +142,10 @@ extension HomeReactor {
                 ])
             }
             .catch {
-                return Observable.error($0)
+                return Observable.concat([
+                    .just(.onError($0 as? ApiError)),
+                    .just(.onError(nil))
+                ])
             }
     }
     
