@@ -49,7 +49,7 @@ class SwipeBannerCollectionViewCell: UICollectionViewCell {
     var cellModel: [BannerItemModel]? {
         didSet {
             guard let model = cellModel else { return }
-            countLabel.text = "\(currentIndex) / \(model.count)"
+            countLabel.text = "\(currentIndex)/\(model.count)"
             bannerItems.accept(model)
         }
     }

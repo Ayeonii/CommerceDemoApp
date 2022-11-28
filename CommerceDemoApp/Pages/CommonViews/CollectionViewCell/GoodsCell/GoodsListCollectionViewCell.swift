@@ -38,7 +38,6 @@ struct GoodsItemModel: Codable {
     }
 }
 
-
 class GoodsListCollectionViewCell: UICollectionViewCell {
     static let identifier = "GoodsListCollectionViewCell"
     

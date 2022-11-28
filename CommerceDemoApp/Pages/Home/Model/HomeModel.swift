@@ -7,7 +7,6 @@
 
 import Foundation
 
-
 struct BannerItemModel {
     var id: Int?
     var image: String
