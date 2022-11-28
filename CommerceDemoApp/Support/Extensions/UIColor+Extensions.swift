@@ -10,6 +10,8 @@ import UIKit
 enum AppMainColor {
     case deepRosePink
     case rosePink
+    case textPrimary
+    case textSecondary
 }
 
 extension UIColor {
@@ -31,8 +33,11 @@ extension UIColor {
         case .deepRosePink:
             return UIColor(rgb: 0xDB545A)
         case .rosePink:
-            return UIColor(rgb: 0xEB5E65)
-            
+            return UIColor(red: 236, green: 94, blue: 101)
+        case .textPrimary:
+            return UIColor.black
+        case .textSecondary:
+            return UIColor(red: 119, green: 119, blue: 119)
         }
     }
 }

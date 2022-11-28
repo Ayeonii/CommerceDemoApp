@@ -26,13 +26,15 @@ class BaseTabBarController: UITabBarController {
         tabBar.tintColor = .appColor(.deepRosePink)
         
         let homeVC = HomeViewController()
+        homeVC.reactor = HomeReactor()
         homeVC.hidesBottomBarWhenPushed = false
         let homeNavigation = UINavigationController(rootViewController: homeVC)
         homeNavigation.tabBarItem = homeIcon
         
         let likeVC = LikeViewController()
+        likeVC.reactor = LikeReactor()
         likeVC.hidesBottomBarWhenPushed = false
-        let likeNavigation = UINavigationController(rootViewController: homeVC)
+        let likeNavigation = UINavigationController(rootViewController: likeVC)
         likeNavigation.tabBarItem = likeIcon
         
         self.viewControllers = [homeNavigation, likeNavigation]

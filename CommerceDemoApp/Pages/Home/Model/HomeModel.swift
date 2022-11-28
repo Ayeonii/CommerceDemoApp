@@ -6,3 +6,14 @@
 //
 
 import Foundation
+
+
+struct BannerItemModel {
+    var id: Int?
+    var image: String
+    
+    init(from res: HomeListBannerResponse?) {
+        self.id = res?.id
+        self.image = res?.image ?? ""
+    }
+}
