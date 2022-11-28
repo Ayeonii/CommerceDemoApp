@@ -82,7 +82,7 @@ class GoodsListCollectionViewCell: UICollectionViewCell {
         $0.font = .systemFont(ofSize: 14, weight: .medium)
     }
     
-    var likeBtn = UIButton().then{
+    var likeBtn = UIButton().then {
         $0.setBackgroundImage(UIImage(systemName: "heart"), for: .normal)
         $0.setBackgroundImage(UIImage(systemName: "heart.fill"), for: .selected)
         $0.tintColor = UIColor.white
@@ -110,7 +110,9 @@ class GoodsListCollectionViewCell: UICollectionViewCell {
         goodsImage.kf.cancelDownloadTask()
         disposeBag = DisposeBag()
     }
-    
+}
+
+extension GoodsListCollectionViewCell {
     func updateUI(model: GoodsItemModel) {
         let isDiscount = (model.discountPercent > 0)
         self.goodsImage.kf.setImage(with: URL(string: model.image))
@@ -127,9 +129,7 @@ class GoodsListCollectionViewCell: UICollectionViewCell {
         self.updatePriceLayout(isDiscount: isDiscount)
         self.updateNewBadgeLayout(isNew: model.isNew)
     }
-}
-
-extension GoodsListCollectionViewCell {
+    
     func configureLayout() {
         self.addSubview(goodsImage)
         self.addSubview(likeBtn)
@@ -210,5 +210,10 @@ extension GoodsListCollectionViewCell {
         sellCountLabel.snp.updateConstraints {
             $0.leading.equalTo(newLabel.snp.trailing).offset(isNew ? 5 : 0)
         }
+    }
+    
+    func setLike(willSelect: Bool) {
+        self.likeBtn.isSelected = willSelect
+        self.likeBtn.tintColor = willSelect ? .appColor(.rosePink) : .white
     }
 }
