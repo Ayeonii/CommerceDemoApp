@@ -11,11 +11,6 @@ import RxCocoa
 import ReactorKit
 import Then
 
-enum HomeSectionType: Int, CaseIterable {
-    case banner = 0
-    case goodsList = 1
-}
-
 class HomeViewController: UIViewController, View {
     var disposeBag = DisposeBag()
     
